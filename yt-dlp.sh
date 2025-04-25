@@ -14,18 +14,42 @@ White='\033[0;37m'	  # White
 destWord="current directory"
 destPath=$(pwd)
 file=""
+quietMode=""
+simulate=""
 
-# Screen that appears when first running script
-function splashScreen()
+
+function continue()
+{
+	echo -e "${White}"
+	read -p "		Press enter to continue..." temp
+}
+
+function showCredits()
 {
 	clear
-	echo -e "${Orange}		Welcome to the yt-dlp easy downloading tool! ${White}\n"
-	echo -e "This script was made in order to streamline the usage of the yt-dlp tool."
-	echo -e "All you need to do is select options desired for output, destination path, etc."
-	echo -e "After that, return to main menu, select the one of the extraction options, and input the desired link(s)."
-	echo -e "									${Red}~ made by bila${White}\n"
-	read -p "			Press enter to continue..." temp
-	clear
+	echo -e "${Red}"
+	echo -e " 	███▄ ▄███▓ ▄▄▄      ▓█████▄ ▓█████     ▄▄▄▄ ▓██   ██▓"
+	echo -e "	▓██▒▀█▀ ██▒▒████▄    ▒██▀ ██▌▓█   ▀    ▓█████▄▒██  ██▒"
+	echo -e "	▓██    ▓██░▒██  ▀█▄  ░██   █▌▒███      ▒██▒ ▄██▒██ ██░"
+	echo -e "	▒██    ▒██ ░██▄▄▄▄██ ░▓█▄   ▌▒▓█  ▄    ▒██░█▀  ░ ▐██▓░"
+	echo -e "	▒██▒   ░██▒ ▓█   ▓██▒░▒████▓ ░▒████▒   ░▓█  ▀█▓░ ██▒▓░"
+	echo -e "	░ ▒░   ░  ░ ▒▒   ▓▒█░ ▒▒▓  ▒ ░░ ▒░ ░   ░▒▓███▀▒ ██▒▒▒ "
+	echo -e "	░  ░      ░  ▒   ▒▒ ░ ░ ▒  ▒  ░ ░  ░   ▒░▒   ░▓██ ░▒░ "
+	echo -e "	░      ░     ░   ▒    ░ ░  ░    ░       ░    ░▒ ▒ ░░  "
+	echo -e "	       ░         ░  ░   ░       ░  ░    ░     ░ ░     "
+	echo -e "	                      ░                      ░░ ░     "
+	echo -e "	 ▄▄▄▄    ██▓ ██▓    ▄▄▄      "
+	echo -e "	▓█████▄ ▓██▒▓██▒   ▒████▄    "
+	echo -e "	▒██▒ ▄██▒██▒▒██░   ▒██  ▀█▄  "
+	echo -e "	▒██░█▀  ░██░▒██░   ░██▄▄▄▄██ "
+	echo -e "	░▓█  ▀█▓░██░░██████▒▓█   ▓██▒"
+	echo -e "	░▒▓███▀▒░▓  ░ ▒░▓  ░▒▒   ▓▒█░"
+	echo -e "	▒░▒   ░  ▒ ░░ ░ ▒  ░ ▒   ▒▒ ░"
+	echo -e "	 ░    ░  ▒ ░  ░ ░    ░   ▒   "
+	echo -e "	 ░       ░      ░  ░     ░  ░"
+	echo -e "	      ░                      "
+	echo ""
+	continue
 }
 
 # Function that checks if all links in a given file are valid
@@ -239,13 +263,94 @@ function showPathMenu()
 	esac
 }
 
+# Internal Options menu, allows user to tweak with
+function showInternalMenu()
+{
+	clear
+	echo -e "${White}=========== ${Red} INTERNAL OPTIONS ${White}==========="
+	echo ""
+	echo -e "	[${Red}1${White}] Update yt-dlp\n	[${Red}2${White}] Toggle Quiet Mode\n	[${Red}3${White}] Toggle Simulate\n\n	[${Red}4${White}] Back"
+	echo -e "=========================================\n"
+	read -p "Select option: " choice
+	clear
+	case $choice in
+
+	1)
+		echo -e "${White}========== UPDATE =========="
+		echo ""
+		echo -e "Would you like to update yt-dlp?\n"
+		read -p "[Y/n] " temp
+		case $temp in
+
+			y)
+				clear
+				yt-dlp --update
+				echo "Finished updating yt-dlp."
+				echo ""
+				read -p "Press enter to continue..." temp2
+				;;
+			Y)
+                                clear
+                                yt-dlp --update
+                                echo "Finished updating yt-dlp."
+                                echo ""
+                                read -p "Press enter to continue..." temp2
+                                ;;
+			yes)
+                                clear
+                                yt-dlp --update
+                                echo "Finished updating yt-dlp."
+                                echo ""
+                                read -p "Press enter to continue..." temp2
+                                ;;
+
+		esac
+		showInternalMenu
+		;;
+	2)
+		if [[ -z "$quietMode" ]]; then
+			quietMode="--quiet"
+			echo -e "Quiet mode has been turned ${Green}ON${White}."
+			echo ""
+			read -p "Press enter to continue..." temp
+		else
+			quietMode=""
+			echo -e "Quiet mode has been turned ${Red}OFF${White}."
+			echo ""
+			read -p "Press enter to continue..." temp
+		fi
+		showInternalMenu
+		;;
+	3)
+		if [[- -z "$simulate" ]]; then
+			simulate="--simulate"
+			echo -e "Simulate has been turned  ${Green}ON${White}."
+			echo ""
+			read -p "Press enter to continue..." temp
+		else
+			simulate=""
+			echo -e "Simulate has been turned ${Red}OFF${White}."
+			echo ""
+			read -p "Press enter to continue..." temp
+		fi
+		showInternalMenu
+		;;
+	4)
+		showMainMenu
+		;;
+	*)
+		showInternalMenu
+		;;
+	esac
+}
+
 # Main menu, top layer of script
 function showMainMenu()
 {
 	clear
 	echo -e "${White}============== ${Red}MAIN MENU ${White}=============="
 	echo ""
-	echo -e "	[${Red}1${White}] Audio Extract\n	[${Red}2${White}] Video Extract\n	[${Red}3${White}] Extract From File\n\n	[${Red}4${White}] Destination Path Settings\n\n	[${Red}5${White}] Exit"
+	echo -e "	[${Red}1${White}] Audio Extract\n	[${Red}2${White}] Video Extract\n	[${Red}3${White}] Extract From File\n\n	[${Red}4${White}] Destination Path Settings\n\n	[${Red}5${White}] Internal Options\n\n	[${Red}6${White}] Credits\n	[${Red}99${White}] Exit"
 	echo -e "${White}======================================="
 	echo ""
 	read -p "Select option: " choice
@@ -255,7 +360,7 @@ function showMainMenu()
 		clear
 		echo -e "${White}=============== ${Red}EXTRACT ${White}==============="
 		read -p "Enter link: " link
-		yt-dlp -x --audio-format mp3 -P $destPath -o '%(title)s.%(ext)s' $link --no-warnings
+		yt-dlp -x --audio-format mp3 -P $destPath -o '%(title)s.%(ext)s' $link $quietMode --no-warnings
 		echo ""
 		read -p "			Press enter to continue..." temp
 		showMainMenu
@@ -276,6 +381,13 @@ function showMainMenu()
 		showPathMenu
 		;;
 	5)
+		showInternalMenu
+		;;
+	6)
+		showCredits
+		showMainMenu
+		;;
+	99)
 		clear
 		exit
 		;;
@@ -285,5 +397,5 @@ function showMainMenu()
 	esac
 }
 
-splashScreen
+#showCredits
 showMainMenu
