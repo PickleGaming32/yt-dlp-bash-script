@@ -20,6 +20,7 @@ simulate=""
 
 function continue()
 {
+	echo ""
 	echo -e "${White}"
 	read -p "		Press enter to continue..." temp
 }
@@ -60,7 +61,7 @@ function validate_links()
 
     while IFS= read -r line; do
         if [[ ! "$line" =~ ^(https:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/ ]]; then
-            #echo "Invalid YouTube link found: $line"
+            echo "Invalid YouTube link found: $line"
             is_valid=false
             break
         fi
@@ -95,13 +96,15 @@ function showFileOptionsMenu()
 		echo -e "${White}=========== ${Red}INPUT FILE${White} ==========="
 		echo ""
 		read -p "Enter file path/name: " tempfile
-		sleep 1
 		clear
+		echo ""
+		echo ""
 		if [ -f "$tempfile" ]; then
 			file=$tempfile
 			echo -e "	File path successfully set to $file"
 		else
 			echo -e "	File path invalid or doesn't point to a file."
+			echo ""
 			echo -e "	File path has not been updated."
 		fi
 		continue
@@ -118,8 +121,8 @@ function showFileOptionsMenu()
 			final_file="${filename}.txt"
 		fi
 		touch "$final_file"
-		sleep 1
 		clear
+		echo ""
 		echo -e "	Successfully created $final_file"
 		continue
 		showFileOptionsMenu
@@ -133,8 +136,8 @@ function showFileOptionsMenu()
 			clear
 			nano $path
 		else
-			sleep 1
 			clear
+			echo ""
 			echo "	Provided path is invalid or does not point to a file."
 			continue
 		fi
@@ -220,6 +223,8 @@ function showPathMenu()
 		clear
 		destPath=$(pwd)
 		destWord="current directory"
+		echo ""
+		echo ""
 		echo "	Output destination set to current working directory"
 		continue
 		showPathMenu
@@ -230,6 +235,8 @@ function showPathMenu()
 		read -p "Input destination path: " dest
 		clear
 		if [ -e "$dest" ]; then
+			echo ""
+			echo ""
 			echo "	The path '$dest' exists and is valid."
 			destPath=$dest
 			destWord=$dest
@@ -237,8 +244,11 @@ function showPathMenu()
 			continue
 			showPathMenu
 		else
-			echo "The path provided by the user is invalid."
-			echo "Output destination path has not been updated."
+			echo ""
+			echo ""
+			echo "	The path provided by the user is invalid."
+			echo ""
+			echo "	Output destination path has not been updated."
 			continue
 			showPathMenu
 		fi
@@ -252,7 +262,7 @@ function showPathMenu()
 	esac
 }
 
-# Internal Options menu, allows user to tweak with
+# Internal Options menu, allows user to tweak with various settings yt-dlp provides
 function showInternalMenu()
 {
 	clear
@@ -265,7 +275,7 @@ function showInternalMenu()
 	case $choice in
 
 	1)
-		echo -e "${White}========== UPDATE =========="
+		echo -e "${White}========== ${Red}UPDATE${White} =========="
 		echo ""
 		echo -e "Would you like to update yt-dlp?\n"
 		read -p "[Y/n] " update
@@ -293,25 +303,29 @@ function showInternalMenu()
 		showInternalMenu
 		;;
 	2)
+		echo -e "======== ${Red}QUIET MODE${White} ========"
+		echo ""
 		if [[ -z "$quietMode" ]]; then
 			quietMode="--quiet"
-			echo -e "Quiet mode has been turned ${Green}ON${White}."
+			echo -e "Quiet mode has been turned [${Green}ON${White}]."
 			continue
 		else
 			quietMode=""
-			echo -e "Quiet mode has been turned ${Red}OFF${White}."
+			echo -e "Quiet mode has been turned [${Red}OFF${White}]."
 			continue
 		fi
 		showInternalMenu
 		;;
 	3)
+		echo -e "======== ${Red}SIMULATE${White} ========"
+		echo ""
 		if [[ -z "$simulate" ]]; then
 			simulate="--simulate"
-			echo -e "Simulate has been turned  ${Green}ON${White}."
+			echo -e "Simulate has been turned  [${Green}ON${White}]."
 			continue
 		else
 			simulate=""
-			echo -e "Simulate has been turned ${Red}OFF${White}."
+			echo -e "Simulate has been turned [${Red}OFF${White}]."
 			continue
 		fi
 		showInternalMenu
