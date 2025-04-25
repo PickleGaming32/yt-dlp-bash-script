@@ -104,8 +104,7 @@ function showFileOptionsMenu()
 			echo -e "	File path invalid or doesn't point to a file."
 			echo -e "	File path has not been updated."
 		fi
-		echo ""
-		read -p "	Press enter to continue..." temp
+		continue
 		showFileOptionsMenu
 		;;
 	2)
@@ -122,8 +121,7 @@ function showFileOptionsMenu()
 		sleep 1
 		clear
 		echo -e "	Successfully created $final_file"
-		echo ""
-		read -p "	Press enter to continue..." temp
+		continue
 		showFileOptionsMenu
 		;;
 	3)
@@ -138,8 +136,7 @@ function showFileOptionsMenu()
 			sleep 1
 			clear
 			echo "	Provided path is invalid or does not point to a file."
-			echo ""
-			read -p "	Press enter to continue..." temp
+			continue
 		fi
 		showFileOptionsMenu
 		;;
@@ -170,18 +167,15 @@ function showFileMenu()
 		if [ -z "$file" ]; then
 			echo -e "	No file has been selected in the file options menu."
 			echo -e "	Please select one and try to extract again."
-			echo ""
-			read -p "	Press enter to continue..." temp
+			continue
 			showFileMenu
 		fi
 		if validate_links $file; then
 			yt-dlp -x --audio-format mp3 -P $destPath -o '%(title)s.%(ext)s' --batch-file $file --no-warnings
-			echo ""
-			read -p "	Press enter to continue..." temp
+			continue
 		else
 			echo -e "	One or more links are invalid."
-			echo ""
-			read -p "	Press enter to continue..." temp
+			continue
 		fi
 		showFileMenu
 		;;
@@ -191,12 +185,10 @@ function showFileMenu()
         	echo ""
 		if validate_links $file; then
 			yt-dlp -f bestvideo*+bestaudio/best --remux-video mp4 -P $destPath -o '$(title)s.%(ext)s' --batch-file $file --no-warnings
-			echo ""
-			read -p "	Press enter to continue..." temp
+			continue
 		else
 			echo -e "	One or more links are invalid."
-			echo ""
-			read -p "	Press enter to continue..." temp
+			continue
 		fi
 		showFileMenu
 		;;
@@ -229,8 +221,7 @@ function showPathMenu()
 		destPath=$(pwd)
 		destWord="current directory"
 		echo "	Output destination set to current working directory"
-		echo ""
-		read -p "			Press enter to continue..." temp
+		continue
 		showPathMenu
 		;;
 	2)
@@ -243,14 +234,12 @@ function showPathMenu()
 			destPath=$dest
 			destWord=$dest
 			echo "	Output destination path successfully set."
-			echo ""
-			read -p "			Press enter to continue..." temp
+			continue
 			showPathMenu
 		else
 			echo "The path provided by the user is invalid."
 			echo "Output destination path has not been updated."
-			echo ""
-			read -p "			Press enter to continue..." temp
+			continue
 			showPathMenu
 		fi
 		;;
@@ -279,31 +268,27 @@ function showInternalMenu()
 		echo -e "${White}========== UPDATE =========="
 		echo ""
 		echo -e "Would you like to update yt-dlp?\n"
-		read -p "[Y/n] " temp
-		case $temp in
+		read -p "[Y/n] " update
+		case $update in
 
 			y)
 				clear
 				yt-dlp --update
 				echo "Finished updating yt-dlp."
-				echo ""
-				read -p "Press enter to continue..." temp2
+				continue
 				;;
 			Y)
                                 clear
                                 yt-dlp --update
                                 echo "Finished updating yt-dlp."
-                                echo ""
-                                read -p "Press enter to continue..." temp2
+                                continue
                                 ;;
 			yes)
                                 clear
                                 yt-dlp --update
                                 echo "Finished updating yt-dlp."
-                                echo ""
-                                read -p "Press enter to continue..." temp2
+                                continue
                                 ;;
-
 		esac
 		showInternalMenu
 		;;
@@ -311,27 +296,23 @@ function showInternalMenu()
 		if [[ -z "$quietMode" ]]; then
 			quietMode="--quiet"
 			echo -e "Quiet mode has been turned ${Green}ON${White}."
-			echo ""
-			read -p "Press enter to continue..." temp
+			continue
 		else
 			quietMode=""
 			echo -e "Quiet mode has been turned ${Red}OFF${White}."
-			echo ""
-			read -p "Press enter to continue..." temp
+			continue
 		fi
 		showInternalMenu
 		;;
 	3)
-		if [[- -z "$simulate" ]]; then
+		if [[ -z "$simulate" ]]; then
 			simulate="--simulate"
 			echo -e "Simulate has been turned  ${Green}ON${White}."
-			echo ""
-			read -p "Press enter to continue..." temp
+			continue
 		else
 			simulate=""
 			echo -e "Simulate has been turned ${Red}OFF${White}."
-			echo ""
-			read -p "Press enter to continue..." temp
+			continue
 		fi
 		showInternalMenu
 		;;
@@ -361,8 +342,7 @@ function showMainMenu()
 		echo -e "${White}=============== ${Red}EXTRACT ${White}==============="
 		read -p "Enter link: " link
 		yt-dlp -x --audio-format mp3 -P $destPath -o '%(title)s.%(ext)s' $link $quietMode --no-warnings
-		echo ""
-		read -p "			Press enter to continue..." temp
+		continue
 		showMainMenu
 		;;
 	2)
@@ -370,8 +350,7 @@ function showMainMenu()
 		echo -e "${White}=============== ${Red}EXTRACT ${White}==============="
 		read -p "Enter link: " link
 		yt-dlp -f bestvideo*+bestaudio/best --remux-video mp4 -P $destPath -o '%(title)s.%(ext)s' --no-warnings $link
-		echo ""
-		read -p "			Press enter to continue..." temp
+		continue
 		showMainMenu
 		;;
 	3)
