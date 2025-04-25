@@ -49,6 +49,7 @@ function showCredits()
 	echo -e "	 ░    ░  ▒ ░  ░ ░    ░   ▒   "
 	echo -e "	 ░       ░      ░  ░     ░  ░"
 	echo -e "	      ░                      "
+	echo -e "						- v.1.2"
 	echo ""
 	continue
 }
