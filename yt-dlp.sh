@@ -11,6 +11,7 @@ Cyan='\033[0;36m'         # Cyan
 White='\033[0;37m'	  # White
 
 # Global variable definition
+version="v.1.2b"
 destWord="current directory"
 destPath=$(pwd)
 file=""
@@ -51,7 +52,7 @@ function showCredits()
 	echo -e "	 ░    ░  ▒ ░  ░ ░    ░   ▒   "
 	echo -e "	 ░       ░      ░  ░     ░  ░"
 	echo -e "	      ░                      "
-	echo -e "						- v.1.2"
+	echo -e "						- $version"
 	echo ""
 	continue
 }
@@ -381,7 +382,7 @@ function showFileMenu()
 			showFileMenu
 		fi
 		if validate_links $file; then
-			yt-dlp -x --audio-format mp3 -P $destPath -o '%(title)s.%(ext)s' --batch-file $file --no-warnings
+			yt-dlp -x --audio-format $audioFormat -P $destPath -o '%(title)s.%(ext)s' --batch-file $file --no-warnings $simulate
 			continue
 		else
 			echo -e "	One or more links are invalid."
@@ -394,7 +395,21 @@ function showFileMenu()
         	echo -e "${White}=============== ${Red}EXTRACT${White} ==============="
         	echo ""
 		if validate_links $file; then
-			yt-dlp -f bestvideo*+bestaudio/best --remux-video mp4 -P $destPath -o '$(title)s.%(ext)s' --batch-file $file --no-warnings
+			case "$videoFormat" in
+			mp4|mkv)
+				yt-dlp -f bestvideo*+bestaudio/best --remux-video "$videoFormat" -P "$destPath" -o '%(title)s.%(ext)s' $link $quietMode --no-warnings $simulate
+				;;
+			*)
+				video_title=$(yt-dlp -f bestvideo*+bestaudio/best --remux-video mp4 -P "$destPath" -o '%(title)s.%(ext)s' $simulate --print after_move:filepath --no-warnings "$link" | tail -n 1)
+				output_file="${video_title%.*}.$videoFormat"
+				if ffmpeg -loglevel fatal -i "$video_title" "$output_file"; then
+					rm "$video_title"
+					echo -e "	Video successfully extracted to $output_file"
+				else
+					echo -e "	ffmpeg failed! The original file has been kept for troubleshooting."
+				fi
+			;;
+			esac
 			continue
 		else
 			echo -e "	One or more links are invalid."
@@ -562,18 +577,36 @@ function showMainMenu()
 		clear
 		echo -e "${White}=============== ${Red}EXTRACT ${White}==============="
 		read -p "Enter link: " link
-		yt-dlp -x --audio-format $audioFormat -P $destPath -o '%(title)s.%(ext)s' $link $quietMode --no-warnings
+		yt-dlp -x --audio-format $audioFormat -P $destPath -o '%(title)s.%(ext)s' $link $quietMode --no-warnings $simulate
 		continue
 		showMainMenu
 		;;
 	2)
 		clear
-		echo -e "${White}=============== ${Red}EXTRACT ${White}==============="
-		read -p "Enter link: " link
-		yt-dlp -f bestvideo*+bestaudio/best --remux-video $videoFormat -P $destPath -o '%(title)s.%(ext)s' --no-warnings $link
-		continue
-		showMainMenu
-		;;
+        echo -e "${White}=============== ${Red}EXTRACT ${White}==============="
+        read -p "Enter link: " link
+        #TODO: In later versions consider adding fancier logic to this section.
+		# mp4 and mk4 can always be remuxed to
+		# mov and webm can sometimes fail and need to check wether or not remuxing was successful
+		# avi, flv and gif always need to be converted using ffmpeg
+		case "$videoFormat" in
+			mp4|mkv)
+				yt-dlp -f bestvideo*+bestaudio/best --remux-video "$videoFormat" -P "$destPath" -o '%(title)s.%(ext)s' $link $quietMode --no-warnings $simulate
+				;;
+			*)
+				video_title=$(yt-dlp -f bestvideo*+bestaudio/best --remux-video mp4 -P "$destPath" -o '%(title)s.%(ext)s' $simulate --print after_move:filepath --no-warnings "$link" | tail -n 1)
+				output_file="${video_title%.*}.$videoFormat"
+				if ffmpeg -loglevel fatal -i "$video_title" "$output_file"; then
+					rm "$video_title"
+					echo -e "	Video successfully extracted to $output_file"
+				else
+					echo -e "	ffmpeg failed! The original file has been kept for troubleshooting."
+				fi
+			;;
+		esac
+        continue
+        showMainMenu
+        ;;
 	3)
 		showFileMenu
 		;;
